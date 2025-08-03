@@ -35,11 +35,12 @@ class Profile(models.Model):
 
 # Many-to-Many: A Book can have many Authors, an Author can write many Books
 # Many-to-One: Each Book belongs to one Library
+
 class Book(models.Model):
     title = models.CharField(max_length=200)
     publication_date = models.DateField()
-    library = models.ForeignKey(Library, on_delete=models.CASCADE)
-    authors = models.ManyToManyField(Author)
+    author = models.ForeignKey('Author', on_delete=models.CASCADE)
+    libraries = models.ManyToManyField('Library')
 
     def __str__(self):
         return self.title
