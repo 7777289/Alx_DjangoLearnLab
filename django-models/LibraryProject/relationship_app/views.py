@@ -1,12 +1,10 @@
-# relationship_app/views.py
-
 from django.shortcuts import render
 from django.views.generic.detail import DetailView
 from .models import Book, Library
 
 # Function-based view
 def list_books(request):
-    books = Book.objects.select_related('author').all()
+    books = Book.objects.select_related('author').prefetch_related('libraries').all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
 
 # Class-based view
