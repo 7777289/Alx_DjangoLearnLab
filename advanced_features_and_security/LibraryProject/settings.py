@@ -38,7 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'relationship_app',
+    'bookshelf',  # <--- Ensure bookshelf is listed
 ]
+
+AUTH_USER_MODEL = 'bookshelf.CustomUser'  # <--- Add this line
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
