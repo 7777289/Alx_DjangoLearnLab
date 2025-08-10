@@ -1,13 +1,33 @@
-from rest_framework import generics
-from .models import Author, Book
-from .serializers import AuthorSerializer, BookSerializer
+from rest_framework import generics, permissions
+from .models import Book
+from .serializers import BookSerializer
 
-# List & create authors, with nested books
-class AuthorListCreateView(generics.ListCreateAPIView):
-    queryset = Author.objects.all()
-    serializer_class = AuthorSerializer
-
-# List & create books
-class BookListCreateView(generics.ListCreateAPIView):
+# List all books
+class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [permissions.AllowAny]  # Public read access
+
+# Retrieve single book
+class BookDetailView(generics.RetrieveAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.AllowAny]  # Public read access
+
+# Create a new book
+class BookCreateView(generics.CreateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Auth required
+
+# Update existing book
+class BookUpdateView(generics.UpdateAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Auth required
+
+# Delete a book
+class BookDeleteView(generics.DestroyAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]  # Auth required
