@@ -40,11 +40,12 @@ INSTALLED_APPS = [
 
     # Third-party apps
     'rest_framework',
+    'django_filters',
 
     # Local apps
     'api',
-        'django_filters',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -108,10 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.SearchFilter',
-        'rest_framework.filters.OrderingFilter',
     ]
 }
+
 
 
 # Internationalization
