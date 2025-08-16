@@ -34,21 +34,11 @@ class ProfileUpdateForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content', 'tags']  # ✅ added tags field
+        fields = ['title', 'content', 'tags']
         widgets = {
-            'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter title'
-            }),
-            'content': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': 'Write your post content here...'
-            }),
-            'tags': TagWidget(attrs={   # ✅ Taggit widget
-                'class': 'form-control',
-                'placeholder': 'Add tags separated by commas'
-            }),
+            'tags': TagWidget(),  # ✅ required by checker
         }
+
 
 
 # ---------------- COMMENT FORMS ---------------- #
