@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import Profile, Post, Comment
+from taggit.forms import TagWidget
 
 
 # ---------------- USER FORMS ---------------- #
@@ -33,7 +34,21 @@ class ProfileUpdateForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'tags']  # ✅ added tags field
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter title'
+            }),
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Write your post content here...'
+            }),
+            'tags': TagWidget(attrs={   # ✅ Taggit widget
+                'class': 'form-control',
+                'placeholder': 'Add tags separated by commas'
+            }),
+        }
 
 
 # ---------------- COMMENT FORMS ---------------- #
