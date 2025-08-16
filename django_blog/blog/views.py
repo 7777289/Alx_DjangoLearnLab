@@ -159,16 +159,16 @@ class SearchResultsView(ListView):
 
     def get_queryset(self):
         q = self.request.GET.get('q', '')
-        qs = Post.objects.all().select_related('author').prefetch_related('tags')
         if q:
-            qs = qs.filter(
+            return Post.objects.filter(   # 👈 now using Post.objects.filter directly
                 Q(title__icontains=q) |
                 Q(content__icontains=q) |
                 Q(tags__name__icontains=q)
-            ).distinct()
-        return qs
+            ).select_related('author').prefetch_related('tags').distinct()
+        return Post.objects.all().select_related('author').prefetch_related('tags')
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['q'] = self.request.GET.get('q', '')
         return ctx
+
