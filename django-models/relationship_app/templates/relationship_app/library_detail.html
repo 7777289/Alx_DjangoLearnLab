@@ -1,0 +1,11 @@
+<h1>{{ library.name }}</h1>
+<p>{{ library.location }}</p>
+
+<h2>Books in this library:</h2>
+<ul>
+  {% for book in library.book_set.all %}
+    <li>{{ book.title }}</li>
+  {% empty %}
+    <li>No books in this library.</li>
+  {% endfor %}
+</ul>
