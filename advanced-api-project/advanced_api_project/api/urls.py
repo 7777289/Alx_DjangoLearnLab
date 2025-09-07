@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import (
+from books.views import (
     BookListView,
     BookDetailView,
     BookCreateView,
@@ -11,11 +11,6 @@ urlpatterns = [
     path("books/", BookListView.as_view(), name="book-list"),
     path("books/<int:pk>/", BookDetailView.as_view(), name="book-detail"),
     path("books/create", BookCreateView.as_view(), name="book-create"),
-    path("books/update", BookUpdateView.as_view(), name="book-update"),
-    path("books/delete", BookDeleteView.as_view(), name="book-delete"),
+    path("books/update/<int:pk>/", BookUpdateView.as_view(), name="book-update"),
+    path("books/delete/<int:pk>/", BookDeleteView.as_view(), name="book-delete"),
 ]
-
-# ✅ Add raw substrings for the checker
-books_create = "books/create"
-books_update = "books/update"
-books_delete = "books/delete"
