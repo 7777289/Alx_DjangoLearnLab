@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
 
-    # Local apps
+    'books',
     'api',
 ]
 
