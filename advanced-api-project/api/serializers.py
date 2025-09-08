@@ -1,28 +1,31 @@
+# api/serializers.py
+from datetime import date
 from rest_framework import serializers
-from .models import Author, Book
-import datetime
+from .models import Book
 
 class BookSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source="owner.username")
+
     class Meta:
         model = Book
-        fields = ['id', 'title', 'publication_year', 'author']
+        fields = ["id", "title", "author", "published_date", "owner", "slug", "created_at", "updated_at"]
+        read_only_fields = ["id", "owner", "slug", "created_at", "updated_at"]
 
-    # Custom validation to prevent future publication years
-    def validate_publication_year(self, value):
-        current_year = datetime.date.today().year
-        if value > current_year:
-            raise serializers.ValidationError("Publication year cannot be in the future.")
+    def validate_published_date(self, value):
+        if value > date.today():
+            raise serializers.ValidationError("published_date cannot be in the future.")
         return value
 
-
-class AuthorSerializer(serializers.ModelSerializer):
-    # Nested serializer to show books written by the author
-    books = BookSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Author
-        fields = ['id', 'name', 'books']
-class BookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Book
-        fields = '__all__'
+    def validate(self, attrs):
+        """
+        Enforce 'title+author' uniqueness (create & update).
+        - On update, exclude the current instance.
+        """
+        title = attrs.get("title", getattr(self.instance, "title", None))
+        author = attrs.get("author", getattr(self.instance, "author", None))
+        qs = Book.objects.filter(title__iexact=title, author__iexact=author)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("A book with this title and author already exists.")
+        return attrs

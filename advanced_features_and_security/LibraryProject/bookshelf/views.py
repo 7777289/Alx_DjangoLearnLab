@@ -1,5 +1,5 @@
 from .forms import ExampleForm
-
+from .forms import ExampleForm
 from django.shortcuts import render
 from django.contrib.auth.decorators import permission_required
 from .models import Book
@@ -23,3 +23,7 @@ def edit_book(request, book_id):
 def delete_book(request, book_id):
     # Example placeholder logic for deleting a book
     return render(request, 'bookshelf/delete_book.html', {'book_id': book_id})
+
+def example_form_view(request):
+    form = ExampleForm()
+    return render(request, 'bookshelf/form_example.html', {'form': form})

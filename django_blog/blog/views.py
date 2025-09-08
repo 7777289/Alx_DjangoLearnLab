@@ -1,15 +1,13 @@
-
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from .models import Post, Comment, Tag
+from .models import Post, Comment
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, PostForm, CommentForm
-from taggit.models import Tag
-
-# ---------------- HOME ---------------- #
+from taggit.models import Tag   # ✅ import Tag from taggit
+----------- HOME ---------------- #
 
 def home(request):
     return render(request, 'blog/home.html')
@@ -53,12 +51,6 @@ def profile(request):
 
 
 # ---------------- POST VIEWS ---------------- #
-
-class PostListView(ListView):
-    model = Post
-    template_name = "blog/post_list.html"
-    context_object_name = "posts"
-    ordering = ["-created_at"]
 
 
 class PostDetailView(DetailView):
