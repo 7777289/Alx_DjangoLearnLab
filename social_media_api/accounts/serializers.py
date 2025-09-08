@@ -1,13 +1,11 @@
-# accounts/serializers.py
-
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.authtoken.models import Token  # <-- exact string required
+from rest_framework.authtoken.models import Token
 
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)  # <-- exact string required
+    password = serializers.CharField(write_only=True)
     followers_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()
 
@@ -21,13 +19,11 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'followers_count', 'following_count']
 
     def create(self, validated_data):
-        # <-- exact string required
         user = get_user_model().objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password']
         )
-        # <-- exact string required
         Token.objects.create(user=user)
         return user
 
@@ -36,4 +32,3 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_following_count(self, obj):
         return obj.following.count()
-
