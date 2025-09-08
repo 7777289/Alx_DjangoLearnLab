@@ -1,6 +1,6 @@
 # accounts/views.py
 
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status, permissions, viewsets
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -8,16 +8,25 @@ from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 
 from django.shortcuts import get_object_or_404
+from django.db.models import Count
 
-from .models import User, UserFollow
+from .models import User
 from .serializers import UserSerializer
 
 class UserRegistrationView(generics.CreateAPIView):
+    """
+    API view for user registration.
+    Allows new users to create an account.
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
 class UserLoginView(ObtainAuthToken):
+    """
+    API view for user login.
+    Returns a token upon successful authentication.
+    """
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})
@@ -31,6 +40,10 @@ class UserLoginView(ObtainAuthToken):
         })
 
 class UserLogoutView(APIView):
+    """
+    API view for user logout.
+    Deletes the authentication token.
+    """
     authentication_classes = [TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated]
 
@@ -42,23 +55,33 @@ class UserLogoutView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
-    queryset = User.objects.all()
+    """
+    API view to retrieve and update the authenticated user's profile.
+    """
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
-    lookup_field = 'username'
 
     def get_object(self):
         return self.request.user
 
 class UserProfileDetailView(generics.RetrieveAPIView):
-    queryset = User.objects.all()
+    """
+    API view to retrieve another user's public profile by username.
+    """
+    queryset = User.objects.all().annotate(
+        followers_count=Count('followers'),
+        following_count=Count('following')
+    )
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     authentication_classes = [TokenAuthentication]
     lookup_field = 'username'
-# Your new view for following
+
 class FollowToggleView(APIView):
+    """
+    API view to follow or unfollow a user.
+    """
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
@@ -69,11 +92,12 @@ class FollowToggleView(APIView):
         if current_user == target_user:
             return Response({"detail": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
-        follow_instance = UserFollow.objects.filter(user=target_user, follower=current_user)
+        # Check if the user is already following the target user
+        is_following = current_user.following.filter(pk=target_user.pk).exists()
 
-        if follow_instance.exists():
-            follow_instance.delete()
+        if is_following:
+            current_user.following.remove(target_user)
             return Response({"detail": f"You have unfollowed {target_user.username}."}, status=status.HTTP_200_OK)
         else:
-            UserFollow.objects.create(user=target_user, follower=current_user)
+            current_user.following.add(target_user)
             return Response({"detail": f"You are now following {target_user.username}."}, status=status.HTTP_201_CREATED)

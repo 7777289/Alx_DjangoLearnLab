@@ -1,4 +1,4 @@
-# accounts/urls.py (within the file)
+# accounts/urls.py
 
 from django.urls import path
 from .views import (
@@ -7,7 +7,7 @@ from .views import (
     UserLogoutView,
     UserProfileView,
     FollowToggleView,
-    UserProfileDetailView  # Add this import
+    UserProfileDetailView
 )
 
 urlpatterns = [
@@ -15,6 +15,6 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogoutView.as_view(), name='logout'),
     path('profile/', UserProfileView.as_view(), name='profile'),
-    path('profile/<str:username>/', UserProfileDetailView.as_view(), name='profile-detail'), # Add this line
+    path('profile/<str:username>/', UserProfileDetailView.as_view(), name='profile-detail'),
     path('users/<int:pk>/follow/', FollowToggleView.as_view(), name='follow-toggle'),
 ]
