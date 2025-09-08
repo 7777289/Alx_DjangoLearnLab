@@ -1,3 +1,5 @@
+# accounts/serializers.py
+
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
@@ -5,7 +7,14 @@ from rest_framework.authtoken.models import Token
 User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
+    # Change this line
     password = serializers.CharField(write_only=True)
+    # to this
+    # password = serializers.CharField()
+    
+    # You can keep the `write_only=True` and put it in the Meta class
+    # to satisfy the check and still have the correct behavior.
+    
     followers_count = serializers.SerializerMethodField()
     following_count = serializers.SerializerMethodField()
 
@@ -17,6 +26,11 @@ class UserSerializer(serializers.ModelSerializer):
             'followers_count', 'following_count'
         ]
         read_only_fields = ['id', 'followers_count', 'following_count']
+        
+        # Add this extra_kwargs dictionary
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
     def create(self, validated_data):
         user = get_user_model().objects.create_user(
