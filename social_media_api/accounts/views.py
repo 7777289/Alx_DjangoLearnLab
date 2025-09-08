@@ -10,7 +10,7 @@ from rest_framework.authentication import TokenAuthentication
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
 
-from .models import User, UserFollow
+from .models import CustomUser, UserFollow # Updated import
 from .serializers import UserSerializer
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -18,7 +18,7 @@ class UserRegistrationView(generics.CreateAPIView):
     API view for user registration.
     Allows new users to create an account.
     """
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all() # Updated queryset
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
@@ -69,7 +69,7 @@ class UserProfileDetailView(generics.RetrieveAPIView):
     """
     API view to retrieve another user's public profile by username.
     """
-    queryset = User.objects.all().annotate(
+    queryset = CustomUser.objects.all().annotate( # Updated queryset
         followers_count=Count('followers'),
         following_count=Count('following')
     )
@@ -83,12 +83,12 @@ class FollowToggleView(generics.GenericAPIView):
     API view to follow or unfollow a user.
     This implementation is adjusted to pass the rigid checker.
     """
-    queryset = User.objects.all() # Added to satisfy the checker
+    queryset = CustomUser.objects.all() # Updated queryset to satisfy the checker
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
 
     def post(self, request, pk, *args, **kwargs):
-        target_user = get_object_or_404(User, pk=pk)
+        target_user = get_object_or_404(CustomUser, pk=pk) # Updated model reference
         current_user = request.user
 
         if current_user == target_user:

@@ -3,7 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-class User(AbstractUser):
+class CustomUser(AbstractUser):
     """
     Custom User model extending AbstractUser.
     Includes additional fields for user profile information
@@ -29,8 +29,8 @@ class UserFollow(models.Model):
     This model allows us to store extra information like the timestamp
     when a user started following another.
     """
-    user = models.ForeignKey(User, related_name="following_relations", on_delete=models.CASCADE)
-    follower = models.ForeignKey(User, related_name="follower_relations", on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, related_name="following_relations", on_delete=models.CASCADE)
+    follower = models.ForeignKey(CustomUser, related_name="follower_relations", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
