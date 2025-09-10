@@ -10,7 +10,7 @@ from rest_framework.authentication import TokenAuthentication
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
 
-from .models import CustomUser, UserFollow # Updated import
+from .models import CustomUser, UserFollow
 from .serializers import UserSerializer
 
 class UserRegistrationView(generics.CreateAPIView):
@@ -18,7 +18,7 @@ class UserRegistrationView(generics.CreateAPIView):
     API view for user registration.
     Allows new users to create an account.
     """
-    queryset = CustomUser.objects.all() # Updated queryset
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
@@ -69,7 +69,7 @@ class UserProfileDetailView(generics.RetrieveAPIView):
     """
     API view to retrieve another user's public profile by username.
     """
-    queryset = CustomUser.objects.all().annotate( # Updated queryset
+    queryset = CustomUser.objects.all().annotate(
         followers_count=Count('followers'),
         following_count=Count('following')
     )
@@ -78,27 +78,54 @@ class UserProfileDetailView(generics.RetrieveAPIView):
     authentication_classes = [TokenAuthentication]
     lookup_field = 'username'
 
-class FollowToggleView(generics.GenericAPIView):
+class FollowView(APIView):
     """
-    API view to follow or unfollow a user.
-    This implementation is adjusted to pass the rigid checker.
+    API view to follow a user.
     """
-    queryset = CustomUser.objects.all() # Updated queryset to satisfy the checker
-    permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request, pk, *args, **kwargs):
-        target_user = get_object_or_404(CustomUser, pk=pk) # Updated model reference
+    def post(self, request, user_id, *args, **kwargs):
+        target_user = get_object_or_404(CustomUser, pk=user_id)
         current_user = request.user
 
         if current_user == target_user:
             return Response({"detail": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
 
-        follow_instance = UserFollow.objects.filter(user=target_user, follower=current_user)
+        # Check if the user is already followed
+        if UserFollow.objects.filter(user=target_user, follower=current_user).exists():
+            return Response({"detail": "You are already following this user."}, status=status.HTTP_409_CONFLICT)
+        
+        # Create the follow relationship
+        UserFollow.objects.create(user=target_user, follower=current_user)
+        return Response({"detail": f"You are now following {target_user.username}."}, status=status.HTTP_201_CREATED)
 
+class UnfollowView(APIView):
+    """
+    API view to unfollow a user.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, user_id, *args, **kwargs):
+        target_user = get_object_or_404(CustomUser, pk=user_id)
+        current_user = request.user
+
+        if current_user == target_user:
+            return Response({"detail": "You cannot unfollow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Find and delete the follow relationship
+        follow_instance = UserFollow.objects.filter(user=target_user, follower=current_user)
         if follow_instance.exists():
             follow_instance.delete()
             return Response({"detail": f"You have unfollowed {target_user.username}."}, status=status.HTTP_200_OK)
         else:
-            UserFollow.objects.create(user=target_user, follower=current_user)
-            return Response({"detail": f"You are now following {target_user.username}."}, status=status.HTTP_201_CREATED)
+            return Response({"detail": "You are not following this user."}, status=status.HTTP_404_NOT_FOUND)
+
+# The original FollowToggleView is no longer needed with the new separate views
+# but can be kept for reference if needed.
+# class FollowToggleView(generics.GenericAPIView):
+#     """
+#     API view to follow or unfollow a user.
+#     """
+#     ...

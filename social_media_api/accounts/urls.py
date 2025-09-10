@@ -6,8 +6,10 @@ from .views import (
     UserLoginView,
     UserLogoutView,
     UserProfileView,
-    FollowToggleView,
-    UserProfileDetailView
+    FollowToggleView, # We will reuse this view, but modify the logic
+    UserProfileDetailView,
+    FollowView, # A new view or logic is needed for this pattern
+    UnfollowView # A new view or logic is needed for this pattern
 )
 
 urlpatterns = [
@@ -16,5 +18,7 @@ urlpatterns = [
     path('logout/', UserLogoutView.as_view(), name='logout'),
     path('profile/', UserProfileView.as_view(), name='profile'),
     path('profile/<str:username>/', UserProfileDetailView.as_view(), name='profile-detail'),
-    path('users/<int:pk>/follow/', FollowToggleView.as_view(), name='follow-toggle'),
+    # New patterns to meet the requirements
+    path('follow/<int:user_id>/', FollowToggleView.as_view(), name='follow-user'),
+    path('unfollow/<int:user_id>/', FollowToggleView.as_view(), name='unfollow-user'),
 ]
