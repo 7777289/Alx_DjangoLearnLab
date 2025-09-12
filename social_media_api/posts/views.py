@@ -88,4 +88,4 @@ class UnlikePostView(APIView):
             return Response({'detail': 'You have not liked this post.'}, status=status.HTTP_404_NOT_FOUND)
             
         return Response({'detail': 'Post unliked successfully.'}, status=status.HTTP_204_NO_CONTENT)
-class PostLikeCountView(APIView):
+    
