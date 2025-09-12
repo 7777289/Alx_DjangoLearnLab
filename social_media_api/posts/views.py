@@ -39,8 +39,8 @@ class CommentListCreateView(generics.ListCreateAPIView):
                 recipient=post.author,
                 actor=self.request.user,
                 verb='commented on your post',
-                target_content_type=ContentType.objects.get_for_model(Post),
-                target_object_id=post.id
+                content_type=ContentType.objects.get_for_model(Post),
+                object_id=post.id
             )
 
 class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -67,8 +67,8 @@ class LikePostView(APIView):
                 recipient=post.author,
                 actor=request.user,
                 verb='liked your post',
-                target_content_type=ContentType.objects.get_for_model(Post),
-                target_object_id=post.id
+                content_type=ContentType.objects.get_for_model(Post),
+                object_id=post.id
             )
 
         return Response({'detail': 'Post liked successfully.'}, status=status.HTTP_201_CREATED)
