@@ -28,8 +28,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     # Local apps
-    'accounts',
+    "accounts",
     "posts",
+    'notifications', 
+    "user_notifications",  # <-- use your new app name
+
 ]
 
 MIDDLEWARE = [
@@ -116,7 +119,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # REST Framework settings
 REST_FRAMEWORK = {

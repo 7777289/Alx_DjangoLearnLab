@@ -1,8 +1,6 @@
-# accounts/admin.py
-
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, UserFollow
+from .models import CustomUser, UserFollow
 
 class CustomUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
@@ -24,5 +22,5 @@ class UserFollowAdmin(admin.ModelAdmin):
     list_display = ('user', 'follower', 'created_at')
 
 
-admin.site.register(User, CustomUserAdmin)
+admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(UserFollow, UserFollowAdmin)
