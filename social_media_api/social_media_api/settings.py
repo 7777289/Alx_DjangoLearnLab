@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # ----------------------------------------------------------------------
-# Production Settings: Use environment variables for security and flexibility
+# Production Settings
 # ----------------------------------------------------------------------
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -75,15 +75,28 @@ TEMPLATES = [
 WSGI_APPLICATION = 'social_media_api.wsgi.application'
 
 # ----------------------------------------------------------------------
-# Database configuration for production and development
+# Database configuration using separate environment variables
 # ----------------------------------------------------------------------
 
-# Use dj_database_url to parse the DATABASE_URL environment variable
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}'
-    )
-}
+if os.environ.get('DB_NAME'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DB_NAME'),
+            'USER': os.environ.get('DB_USER'),
+            'PASSWORD': os.environ.get('DB_PASSWORD'),
+            'HOST': os.environ.get('DB_HOST'),
+            'PORT': os.environ.get('DB_PORT'),
+        }
+    }
+else:
+    # Fallback to SQLite for local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # ----------------------------------------------------------------------
 # Password validation
@@ -118,9 +131,7 @@ USE_TZ = True
 # ----------------------------------------------------------------------
 
 STATIC_URL = 'static/'
-# Define the directory where 'collectstatic' will place static files
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-# Use WhiteNoise to serve static files in production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media file settings
@@ -131,14 +142,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # AWS S3 Settings for Media Files
 # ----------------------------------------------------------------------
 
-# Configure these settings only if DEBUG is False
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
-
-# Optional: Use a custom domain for your S3 bucket
-# AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
@@ -149,13 +156,10 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 # Security Settings
 # ----------------------------------------------------------------------
 
-# Ensure all HTTP requests are redirected to HTTPS
 SECURE_SSL_REDIRECT = True
-# Ensure secure cookies are used
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-# Protection against XSS, clickjacking, and mime-type sniffing
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True
