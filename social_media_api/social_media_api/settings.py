@@ -16,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-@e%05y#^a1-!r8_1m(p!3t&y_g)s+r!879z5t3-8h$6x')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+DEBUG = False
 
 # ALLOWED_HOSTS must be configured in production
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
@@ -128,38 +128,37 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # ----------------------------------------------------------------------
-# AWS S3 Settings for Media Files (Production Only)
+# AWS S3 Settings for Media Files
 # ----------------------------------------------------------------------
 
-if not DEBUG:
-    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
+# Configure these settings only if DEBUG is False
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
+
+# Optional: Use a custom domain for your S3 bucket
+# AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
     
-    # Optional: Use a custom domain for your S3 bucket
-    # AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-    
-    AWS_S3_FILE_OVERWRITE = False
-    AWS_DEFAULT_ACL = None # Recommended for private files, e.g., if you don't want them publicly accessible
-    
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # ----------------------------------------------------------------------
 # Security Settings
 # ----------------------------------------------------------------------
 
-if not DEBUG:
-    # Ensure all HTTP requests are redirected to HTTPS
-    SECURE_SSL_REDIRECT = True
-    # Ensure secure cookies are used
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    
-    # Protection against XSS, clickjacking, and mime-type sniffing
-    SECURE_BROWSER_XSS_FILTER = True
-    X_FRAME_OPTIONS = 'DENY'
-    SECURE_CONTENT_TYPE_NOSNIFF = True
+# Ensure all HTTP requests are redirected to HTTPS
+SECURE_SSL_REDIRECT = True
+# Ensure secure cookies are used
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Protection against XSS, clickjacking, and mime-type sniffing
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # ----------------------------------------------------------------------
 # Default primary key field type
